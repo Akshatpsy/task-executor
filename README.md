@@ -13,4 +13,4 @@ For a portfolio deployment, we recommend deploying the API to a service like [Ra
    - `RABBITMQ_URL`
 4. Set the start command to run the API: `uvicorn src.api:app --host 0.0.0.0 --port $PORT`
 
-*Note: The scheduler and worker are designed to run as separate background processes. In a free-tier portfolio deployment, you can deploy just the API as the live, interactive component while demonstrating the scheduler and worker functionality via recorded testing evidence.*
+*Note: The scheduler and worker are designed to run as separate background processes. In a free-tier portfolio deployment, you can deploy just the API as the live, interactive component while demonstrating the scheduler and worker functionality via recorded testing evidence. As a result, tasks submitted via the live demo will intentionally remain in the 'pending' or 'queued' state.*
