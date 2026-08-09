@@ -14,11 +14,20 @@ def insert_task(task):
             """
             INSERT INTO tasks (id, dependencies, status, idempotency_key)
             VALUES (%s, %s, %s, %s)
-            ON CONFLICT (id) DO NOTHING
+            ON CONFLICT (id) DO UPDATE SET
+                status = 'pending',
+                dependencies = EXCLUDED.dependencies,
+                start_time = NULL,
+                end_time = NULL,
+                output = NULL,
+                error = NULL,
+                retry_count = 0,
+                worker_id = NULL,
+                heartbeat_at = NULL
             """,
             (task.id, task.dependencies, "pending", task.idempotency_key),
         )
-
+        
 def update_task_status(task_id, status, start_time=None, end_time=None, output=None, error=None):
     with get_connection() as conn:
         conn.execute(
