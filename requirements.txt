@@ -1,0 +1,6 @@
+psycopg[binary]
+python-dotenv
+pytest
+fastapi
+uvicorn
+websockets
