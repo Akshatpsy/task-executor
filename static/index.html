@@ -597,13 +597,21 @@
           return;
         }
         closeModal();
+        // Brief visual feedback on the primary button
+        const btn = document.querySelector('.actions-bar .btn:not(.btn-secondary)');
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = '✓ DAG Submitted!';
+          btn.style.background = 'var(--status-success)';
+          setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+        }
       } catch (e) {
         alert('Invalid JSON payload: ' + e.message);
       }
     }
 
-    // FIX: append a unique suffix to every task ID so resubmitting doesn't
-    // silently no-op against existing rows (insert_task uses ON CONFLICT DO NOTHING).
+    // Submit the canonical task IDs — the backend's ON CONFLICT DO UPDATE
+    // resets existing rows to 'pending' so resubmitting always re-queues them.
     async function submitSampleDag() {
       const payload = {
         tasks: [
@@ -614,14 +622,26 @@
           { id: "notify", dependencies: ["load"] }
         ]
       };
-      const res = await fetch('/dags', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        alert('Submission Error: ' + (err.detail || JSON.stringify(err)));
+      try {
+        const res = await fetch('/dags', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          alert('Submission Error: ' + (err.detail || JSON.stringify(err)));
+        } else {
+          const btn = document.querySelector('.actions-bar .btn-secondary');
+          if (btn) {
+            const orig = btn.textContent;
+            btn.textContent = '✓ Submitted!';
+            btn.style.color = 'var(--status-success)';
+            setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+          }
+        }
+      } catch (e) {
+        alert('Network error: ' + e.message);
       }
     }
 
